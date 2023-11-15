@@ -28,8 +28,8 @@ class MyPopup(QWidget):
         self.setWindowTitle('sifi21_1.2.3-0008')
         self.images_location = images_location
         label = QLabel(self)
-        pixmap = QPixmap(self.images_location + "about.tif")
-        label.setPixmap(pixmap)
+        # pixmap = QPixmap(self.images_location + "about.tif")
+        # label.setPixmap(pixmap)
 
         label.mousePressEvent = self.open_url
 
@@ -56,8 +56,10 @@ class MyMainWindow(QMainWindow):
         # Does not work reliable on all OS, that's why we split of "local" and add application folder name manually
         # self.data_location = str(QDesktopServices.storageLocation(QDesktopServices.DataLocation))
         self.data_location = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-        self.data_location = "/Users/daxledesma/sifitemp"
-        self.app_location = self.data_location + '/siFi2015'
+        self.data_location = "C:/Users/dakil/AppData/Local/siFi2015"
+        # self.data_location = "C:\\Users\\dakil\\OneDrive\\Documents\\GitHub\\siFi21-"
+        # self.app_location = self.data_location + '/siFi2015'
+        self.app_location = self.data_location
         # self.home_location = str(QDesktopServices.storageLocation(QDesktopServices.HomeLocation))
         self.home_location = QStandardPaths.writableLocation(QStandardPaths.HomeLocation)
         # self.temp_location = str(QDesktopServices.storageLocation(QDesktopServices.TempLocation))
@@ -69,17 +71,23 @@ class MyMainWindow(QMainWindow):
 
 
         # Create required folders and copy required files
-        try:
-            general_helpers.create_folders([self.app_location, self.images_location, self.bowtie_location,
-                                            self.rnaplfold_location, self.db_location],
-                                           [self.app_location + 'logging_sifi.txt', self.app_location + 'last_db.txt'])
-            general_helpers.copying_files(self.app_location)
-            self.log_file = self.app_location + '/logging_sifi.txt'
-            self.lastdb_file = self.app_location + '/last_db.txt'
-
-        except (IOError, OSError) as e:
-            print(e)
-            self.show_info_message('Could not create folder or file.')
+        general_helpers.create_folders([self.app_location, self.images_location, self.bowtie_location,
+                                        self.rnaplfold_location, self.db_location],
+                                       [self.app_location + 'logging_sifi.txt', self.app_location + 'last_db.txt'])
+        general_helpers.copying_files(self.app_location)
+        self.log_file = self.app_location + '/logging_sifi.txt'
+        self.lastdb_file = self.app_location + '/last_db.txt'
+        # try:
+        #     general_helpers.create_folders([self.app_location, self.images_location, self.bowtie_location,
+        #                                     self.rnaplfold_location, self.db_location],
+        #                                    [self.app_location + 'logging_sifi.txt', self.app_location + 'last_db.txt'])
+        #     general_helpers.copying_files(self.app_location)
+        #     self.log_file = self.app_location + '/logging_sifi.txt'
+        #     self.lastdb_file = self.app_location + '/last_db.txt'
+        #
+        # except (IOError, OSError) as e:
+        #     print(e)
+        #     self.show_info_message('Could not create folder or file.')
 
         self.setWindowIcon(QIcon(self.images_location + "siFi21_icon64.tif"))
 
