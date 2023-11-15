@@ -12,7 +12,7 @@ from collections import Counter
 
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_dna
+# from Bio.Alphabet import generic_dna
 from Bio.SeqFeature import FeatureLocation
 from Bio import SeqIO
 from Bio.SeqFeature import SeqFeature
@@ -159,7 +159,7 @@ def get_target_data(f_in, sirna_size):
 
 def group_ranges(data):
     ranges = []
-    for k, g in groupby(enumerate(data), lambda (i,x):i-x):
+    for k, g in groupby(enumerate(data), lambda ix: ix[0] - ix[1]):
         group = map(itemgetter(1), g)
         ranges.append((group[0], group[-1]))
     return ranges
@@ -172,7 +172,6 @@ def create_gbk(main_target_dict, off_target_dict, seq_file, out_file):
     data = SeqIO.read(open(seq_file + '.fasta'), "fasta")
     my_sequence = Seq(str(data.seq))
     my_sequence_record = SeqRecord(my_sequence)
-    my_sequence_record.seq.alphabet = generic_dna
 
     for target, positions in main_target_dict.iteritems():
         group = group_ranges(positions)

@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QSizePolicy
 from PIL import Image
 import shutil
 import os
 import general_helpers
 
 
-class ImageViewer(QtGui.QMainWindow):
+class ImageViewer(QMainWindow):
     # QMainWindow doesn't have a closed signal, so we'll make one.
     closed = QtCore.pyqtSignal()
 
     def __init__(self, parent, fileName, mode, table_data, main_target_dict, off_target_dict, seq_file):
-        QtGui.QMainWindow.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
         self.parent = parent
         self.printer = QtGui.QPrinter()
 

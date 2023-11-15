@@ -1,5 +1,5 @@
-from PyQt4 import QtGui, QtCore, QtNetwork
-import FileDialog
+from PyQt5 import QtGui, QtCore, QtNetwork
+# import FileDialog
 
 import sys
 import webbrowser
@@ -13,19 +13,22 @@ import sifi_pipeline
 import imageviewer
 
 from Resources.ui_sifi2015 import Ui_MainWindow
+from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QInputDialog, QLineEdit, QDesktopWidget, QMainWindow, \
+    QLabel, QApplication, QTabBar, QTableWidgetItem, QPushButton, QStyleFactory
+from PyQt5.QtGui import QIcon, QPixmap, QDesktopServices, QFont
+from PyQt5.QtCore import QStandardPaths
 
 # pyrcc4 sifi_2015.qrc > sifi_2015_rc.py
 # pyuic4 sifi2015.ui > ui_sifi2015.py
 # pyuic4 wizard.ui > wizard_ui.py
 
-
-class MyPopup(QtGui.QWidget):
+class MyPopup(QWidget):
     def __init__(self, images_location):
-        QtGui.QWidget.__init__(self)
+        QWidget.__init__(self)
         self.setWindowTitle('sifi21_1.2.3-0008')
         self.images_location = images_location
-        label = QtGui.QLabel(self)
-        pixmap = QtGui.QPixmap(self.images_location + "about.tif")
+        label = QLabel(self)
+        pixmap = QPixmap(self.images_location + "about.tif")
         label.setPixmap(pixmap)
 
         label.mousePressEvent = self.open_url
@@ -34,32 +37,35 @@ class MyPopup(QtGui.QWidget):
         webbrowser.open("http://www.snowformatics.com/")
 
     def center(self):
-        screen = QtGui.QDesktopWidget().screenGeometry()
+        screen = QDesktopWidget().screenGeometry()
         size = self.frameSize()
         self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
 
 
-class MyMainWindow(QtGui.QMainWindow):
+class MyMainWindow(QMainWindow):
     def __init__(self, *args):
         """Main window of si-Fi."""
-        QtGui.QMainWindow.__init__(self, *args)
+        QMainWindow.__init__(self, *args)
         self.ui = Ui_MainWindow()
 
         # resolution
-        #res = QtGui.QDesktopWidget().screenGeometry()
+        #res = QDesktopWidget().screenGeometry()
         #self.resize(100, 200)
 
         # Some important locations
         # Does not work reliable on all OS, that's why we split of "local" and add application folder name manually
-        self.data_location = str(QtGui.QDesktopServices.storageLocation(QtGui.QDesktopServices.DataLocation))
-        self.data_location = self.data_location.split('Local')[0] + '/Local/'
-        self.app_location = self.data_location + '/siFi2015/'
-        self.home_location = str(QtGui.QDesktopServices.storageLocation(QtGui.QDesktopServices.HomeLocation))
-        self.temp_location = str(QtGui.QDesktopServices.storageLocation(QtGui.QDesktopServices.TempLocation))
-        self.images_location = self.app_location + '/Images/'
-        self.bowtie_location = self.app_location + '/Bowtie/'
-        self.rnaplfold_location = self.app_location + '/RNAplfold/'
-        self.db_location = self.app_location + '/Databases/'
+        # self.data_location = str(QDesktopServices.storageLocation(QDesktopServices.DataLocation))
+        self.data_location = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+        self.data_location = "/Users/daxledesma/sifitemp"
+        self.app_location = self.data_location + '/siFi2015'
+        # self.home_location = str(QDesktopServices.storageLocation(QDesktopServices.HomeLocation))
+        self.home_location = QStandardPaths.writableLocation(QStandardPaths.HomeLocation)
+        # self.temp_location = str(QDesktopServices.storageLocation(QDesktopServices.TempLocation))
+        self.temp_location = QStandardPaths.writableLocation(QStandardPaths.TempLocation)
+        self.images_location = self.app_location + 'Images'
+        self.bowtie_location = self.app_location + 'Bowtie'
+        self.rnaplfold_location = self.app_location + 'RNAplfold'
+        self.db_location = self.app_location + 'Databases'
 
 
         # Create required folders and copy required files
@@ -71,17 +77,18 @@ class MyMainWindow(QtGui.QMainWindow):
             self.log_file = self.app_location + '/logging_sifi.txt'
             self.lastdb_file = self.app_location + '/last_db.txt'
 
-        except (IOError, OSError):
+        except (IOError, OSError) as e:
+            print(e)
             self.show_info_message('Could not create folder or file.')
 
-        self.setWindowIcon(QtGui.QIcon(self.images_location + "siFi21_icon64.tif"))
+        self.setWindowIcon(QIcon(self.images_location + "siFi21_icon64.tif"))
 
         # Setup UI
 
         self.ui.setupUi(self)
         self.ui.plainTextEdit_seq.setFocus()
-        self.ui.tabWidget.tabBar().setTabButton(0, QtGui.QTabBar.RightSide, None)
-        self.ui.tabWidget.tabBar().setTabButton(1, QtGui.QTabBar.RightSide, None)
+        self.ui.tabWidget.tabBar().setTabButton(0, QTabBar.RightSide, None)
+        self.ui.tabWidget.tabBar().setTabButton(1, QTabBar.RightSide, None)
         #self.ui.statusbar.showMessage("System Status | Normal | " + self.app_location)
 
         # Aks user which mode to use
@@ -105,7 +112,8 @@ class MyMainWindow(QtGui.QMainWindow):
         self.ui.actionDocumentation.triggered.connect(self.show_help)
         self.ui.actionAbout.triggered.connect(self.show_about_message)
         self.ui.pushButton_openDB.clicked.connect(self.open_file_and_insert_seq)
-        self.connect(self.ui.comboBox_miss, QtCore.SIGNAL("currentIndexChanged(const QString&)"), self.test)
+        # self.connect(self.ui.comboBox_miss, QtCore.SIGNAL("currentIndexChanged(const QString&)"), self.test)
+        self.ui.comboBox_miss.currentIndexChanged[str].connect(self.test)
 
     def test(self):
         widget_lst = [self.ui.checkBox_end,  self.ui.doubleSpinBox_end, self.ui.checkBox_access,
@@ -221,7 +229,7 @@ class MyMainWindow(QtGui.QMainWindow):
         table_headers = database_dict.keys()
         for row, key in enumerate(database_dict.keys()):
             for column, item in enumerate(database_dict[key]):
-                new_item = QtGui.QTableWidgetItem(str(item))
+                new_item = QTableWidgetItem(str(item))
                 if row == 0:
                     new_item.setCheckState(QtCore.Qt.Unchecked)
                 self.ui.tableWidget.setItem(column, row, new_item)
@@ -240,10 +248,10 @@ class MyMainWindow(QtGui.QMainWindow):
                             db_to_delete.append(str(checked_name))
 
         if db_to_delete:
-            delete = QtGui.QMessageBox.question(self, u"Delete database?",
+            delete = QMessageBox.question(self, u"Delete database?",
                                                 u"Are you sure that you want to delete the database(s)?",
-                                                QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-            if delete == QtGui.QMessageBox.Yes:
+                                                QMessageBox.Yes, QMessageBox.No)
+            if delete == QMessageBox.Yes:
                 info_message = database_helpers.delete_databases(db_to_delete, self.db_location)
                 time.sleep(1)
                 self.show_info_message(info_message[0])
@@ -266,16 +274,16 @@ class MyMainWindow(QtGui.QMainWindow):
     def show_mode_question(self):
         """Pop up a mode message questions.
            Adjust the settings corresponding to choice."""
-        msg_box = QtGui.QMessageBox()
-        font = QtGui.QFont()
+        msg_box = QMessageBox()
+        font = QFont()
         font.setPointSize(12)
         msg_box.setFont(font)
         msg_box.setText('Which mode would you like to use?')
         msg_box.setWindowTitle('Choose mode')
-        btn_design = QtGui.QPushButton(' RNAi design ')
-        msg_box.addButton(btn_design, QtGui.QMessageBox.YesRole)
-        btn_check = QtGui.QPushButton(' Off-target prediction ')
-        msg_box.addButton(btn_check, QtGui.QMessageBox.NoRole)
+        btn_design = QPushButton(' RNAi design ')
+        msg_box.addButton(btn_design, QMessageBox.YesRole)
+        btn_check = QPushButton(' Off-target prediction ')
+        msg_box.addButton(btn_check, QMessageBox.NoRole)
         self.mode = msg_box.exec_()
 
         # For off-target prediction, disable efficiency settings
@@ -303,7 +311,7 @@ class MyMainWindow(QtGui.QMainWindow):
 
     def open_sequence_file(self, file_format):
         """Open a sequence file and return the path."""
-        sequence_file_location = QtGui.QFileDialog.getOpenFileName(
+        sequence_file_location = QFileDialog.getOpenFileName(
                                     self,
                                     u"Open a sequence file",
                                     self.home_location,
@@ -364,7 +372,7 @@ class MyMainWindow(QtGui.QMainWindow):
 
     def show_info_message(self, message):
         """Pop up an info message."""
-        QtGui.QMessageBox.information(self,
+        QMessageBox.information(self,
                                       u"Information",
                                       message)
 
@@ -382,12 +390,12 @@ class MyMainWindow(QtGui.QMainWindow):
 
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     screen_size = app.desktop().screenGeometry()
     width, height = screen_size.width(), screen_size.height()
 
-    QtGui.QApplication.setStyle(QtGui.QStyleFactory.create("gtk"))
-    QtGui.QApplication.setPalette(QtGui.QApplication.style().standardPalette())
+    QApplication.setStyle(QStyleFactory.create("gtk"))
+    QApplication.setPalette(QApplication.style().standardPalette())
     myapp = MyMainWindow()
 
     if height < 830:

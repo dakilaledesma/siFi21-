@@ -1,11 +1,20 @@
-from PyQt4 import QtCore, QtGui
-from matplotlib.backends.backend_qt4agg \
-    import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg \
-    import NavigationToolbar2QT as NavigationToolbar
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QInputDialog, QLineEdit, QSizePolicy
+
+# Your code to use QDialog
+
+# from matplotlib.backends.backend_qt4agg \
+#     import FigureCanvasQTAgg as FigureCanvas
+# from matplotlib.backends.backend_qt4agg \
+#     import NavigationToolbar2QT as NavigationToolbar
+# from matplotlib.figure import Figure
+# from matplotlib.backends.backend_qt4agg \
+#     import NavigationToolbar2QT
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg \
-    import NavigationToolbar2QT
+
 from matplotlib.patches import Rectangle
 import matplotlib.lines as mlines
 
@@ -23,7 +32,7 @@ class NavigationToolbar(NavigationToolbar2QT):
     toolitems = [t for t in NavigationToolbar2QT.toolitems if t[0] in ('Home', 'Zoom', 'Save')]
 
 
-class DrawPlot(QtGui.QMainWindow):
+class DrawPlot(QMainWindow):
     def __init__(self, sirna_size, query_sequence, sifi_data, off_target_pos_list, region_plot_lst, temp_location,
                  scoret_lst, main_targets, f_in, mode, table_data, parent = None):
         """Class for drawing the plots inside a window."""

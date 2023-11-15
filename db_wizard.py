@@ -1,12 +1,13 @@
 import os
 import threads
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QWizard
 from Resources.ui_db_wizard import Ui_wizard
 
 
-class DBWizard(QtGui.QWizard):
+class DBWizard(QWizard):
     def __init__(self, mainWindow, data_location, app_location, home_location, db_location, bowtie_location):
-        QtGui.QWizard.__init__(self)
+        QWizard.__init__(self)
 
         self.data_location = data_location
         self.app_location = app_location

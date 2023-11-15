@@ -1,7 +1,8 @@
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QDialog
 
 
-class ListSelection(QtGui.QDialog):
+class ListSelection(QDialog):
     def __init__(self, item_ls, parent=None):
         """Pop up dialog to choose the main targets for design plot."""
         super(ListSelection, self).__init__(parent)
